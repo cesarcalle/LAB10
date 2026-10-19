@@ -87,3 +87,7 @@ Excepción: si el usuario pidió saltarse las preguntas, la regla no aplica.
 | "Le doy opciones para ahorrarle esfuerzo" | Las opciones dirigen. Primero que describa. |
 | "Pongo valores por defecto razonables" | Bien, pero dilos en voz alta. |
 | "Dijo 'suena bien'" | Solo aprobó lo que viste escrito. |
+
+---
+
+Basada en la skill `brainstorming` de [obra/superpowers](https://github.com/obra/superpowers) (licencia MIT, Copyright (c) 2025 Jesse Vincent).
