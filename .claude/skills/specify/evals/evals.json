@@ -1,0 +1,23 @@
+{
+  "skill_name": "specify",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "quiero agregar al lab un control de inventario de medicamentos de la farmacia del hospital: que se registren entradas y salidas y avise cuando el stock baje del minimo. hazme la spec, no me hagas preguntas, asume lo razonable",
+      "expected_output": "Crea solo .kiro/specs/<nombre>/requirements.md (introducción con suposiciones, historias de usuario, criterios EARS con WHEN/IF ... THEN THE SYSTEM SHALL en español), sin design.md, tasks.md ni SQL, y pide aprobación para pasar al diseño.",
+      "files": ["fixtures/base"]
+    },
+    {
+      "id": 1,
+      "prompt": "revisé los requisitos de la spec citas-paciente y están bien, aprobados. sigue",
+      "expected_output": "Crea .kiro/specs/citas-paciente/design.md con las secciones Resumen, Arquitectura, Componentes e interfaces, Modelos de datos, Manejo de errores y Estrategia de pruebas, cubriendo los requisitos; no crea tasks.md ni código; pide aprobación del diseño.",
+      "files": ["fixtures/spec-req"]
+    },
+    {
+      "id": 2,
+      "prompt": "ya aprobé todo lo de citas-paciente. haz la tarea 1",
+      "expected_output": "Lee la spec, crea citas.sql con la secuencia y la tabla cita según el diseño, marca la tarea 1 como [x] en tasks.md, no implementa las tareas 2-4 y se detiene resumiendo.",
+      "files": ["fixtures/spec-full"]
+    }
+  ]
+}
