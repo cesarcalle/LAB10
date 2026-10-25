@@ -1,6 +1,6 @@
 ---
 name: planning-task
-description: Planea las tareas de implementación de una spec en .kiro/specs/NOMBRE/ a partir de su requirements.md y design.md, lanzando subagentes planner - uno solo para la estimación inicial si tasks.md no tiene tareas, o uno por cada tarea si ya existen - y juntando sus propuestas en un plan de consenso hasta que tasks.md quede 100% iterado. Úsala siempre que el usuario pida crear, estimar, revisar, mejorar, completar o "cerrar" el plan de tareas (tasks.md) de una spec, cuando diga que los requisitos y el diseño ya están aprobados y quiera pasar a las tareas, o cuando pida revisar si las tareas tienen el tamaño correcto, si sobran o si faltan, aunque no diga "planning-task" ni "planner".
+description: Planea las tareas de implementación de una spec en .kiro/specs/NOMBRE/ a partir de su requirements.md y design.md, lanzando subagentes planner - uno solo para la estimación inicial si tasks.md no tiene tareas, o uno por cada tarea si ya existen - y juntando sus propuestas en un plan de consenso hasta que tasks.md quede 100% iterado. Es la fase 3 del skill specify. Úsala siempre que el usuario pida crear, estimar, revisar, mejorar, completar o "cerrar" el plan de tareas (tasks.md) de una spec, cuando diga que los requisitos y el diseño ya están aprobados y quiera pasar a las tareas, o cuando pida revisar si las tareas tienen el tamaño correcto, si sobran o si faltan, aunque no diga "planning-task" ni "planner".
 ---
 
 # Planning task
