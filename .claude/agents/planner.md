@@ -241,7 +241,11 @@ En modo `propuesta`, `ESTADO` es `PROPUESTA` (o `BLOQUEADO`), omites
 ````
 
 En el bloque usa números provisionales a partir del número de la tarea
-(`3`, `3.1`, `3.2`); quien aplica las propuestas renumera.
+(`3`, `3.1`, `3.2`); quien aplica las propuestas renumera. El bloque es
+solo el reemplazo de **tu** tarea: si la eliminas, escribe `ELIMINAR`
+aunque propongas otra tarea en su lugar, y esa otra va en `Tareas
+faltantes`. Así quien junta las propuestas sabe qué ya revisaste y qué
+falta revisar.
 
 Que el plan esté `COMPLETO` no significa que esté aprobado: lo aprueba el
 usuario después de leerlo.

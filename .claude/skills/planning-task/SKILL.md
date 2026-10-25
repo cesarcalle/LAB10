@@ -31,6 +31,13 @@ sentido (orden, cobertura, sin duplicados).
    creó después de abrir la sesión), usa `general-purpose` y empieza el
    prompt con: "Lee `.claude/agents/planner.md` y actúa exactamente como
    ese agente."
+
+   Ejecuta este skill en la conversación principal, no lo delegues a un
+   subagente: según el entorno, un subagente puede no tener la
+   herramienta para lanzar otros, y entonces no habría planners. Si aun
+   así no puedes lanzar subagentes, haz cada llamada del planner tú mismo
+   siguiendo `planner.md` al pie de la letra, una a la vez, y avísale al
+   usuario en el informe que la revisión no vino de contextos separados.
 3. **Estado.** Mide dónde está el plan:
 
    ```bash
@@ -118,8 +125,12 @@ tarea: siguiente
 Como todas están revisadas, hace la revisión final del plan completo.
 
 - Si responde `COMPLETO`, terminaste.
-- Si responde `CONTINUAR`, cambió algo (por ejemplo, reordenó): lo que
-  tocó vuelve a pendiente; haz otra ronda y vuelve al cierre.
+- Si responde `CONTINUAR`, corrigió algo del conjunto (un orden, una
+  dependencia entre tareas que una revisión aislada no podía ver). Mide
+  con el script: si sigue en 100%, el planner ya revisó lo que tocó y
+  lanzas otro cierre; si bajó, haz una ronda con lo pendiente y vuelve al
+  cierre. Es normal que el primer cierre encuentre algo: es la única
+  revisión que ve todas las tareas juntas.
 
 **Límite:** 5 rondas en total. Si se alcanzan sin `COMPLETO`, para y dile
 al usuario qué tareas siguen cambiando de una ronda a otra y por qué. Si
@@ -153,6 +164,7 @@ tareas en el mismo turno.
 | Pensamiento | Realidad |
 |---|---|
 | "Hay tareas, pero las reviso yo para ir más rápido" | La revisión es del planner, que mira el repo con su propio contexto. Tú juntas. |
+| "Le paso todo el skill a un subagente para no llenar mi contexto" | Puede quedarse sin forma de lanzar planners. El skill corre en la conversación principal. |
 | "Lanzo los planners en modo aplicar, es más simple" | Escriben a la vez en el mismo archivo y se borran los cambios unos a otros. |
 | "Dos propuestas chocan; me quedo con la que me gusta" | Un conflicto lo resuelve un planner que lee las dos y la spec. |
 | "El script da 100%, ya está" | Falta la revisión final: el porcentaje no ve el orden ni los duplicados. |
