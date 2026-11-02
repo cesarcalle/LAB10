@@ -5,6 +5,7 @@
 -- Contenido:
 --   1. Secuencia seq_cita y tabla cita
 --   2. Procedimiento registrar_cita
+--   3. Vista v_citas_paciente
 -- Requiere que la tabla paciente (id_paciente NUMBER, nombre) ya exista.
 -- =====================================================================
 
@@ -56,3 +57,22 @@ BEGIN
     VALUES (seq_cita.NEXTVAL, p_id_paciente, p_fecha);
 END registrar_cita;
 /
+
+
+-- =====================================================================
+-- 3. VISTA V_CITAS_PACIENTE
+-- =====================================================================
+-- Citas con el nombre del paciente. Un ORDER BY dentro de una vista no
+-- garantiza el orden cuando se la filtra, así que las consultas vuelven
+-- a ordenar por fecha:
+--   SELECT * FROM v_citas_paciente WHERE id_paciente = :id ORDER BY fecha;
+
+CREATE OR REPLACE VIEW v_citas_paciente AS
+SELECT c.id_cita,
+       c.id_paciente,
+       p.nombre AS nombre_paciente,
+       c.fecha,
+       c.estado
+FROM   cita c
+JOIN   paciente p ON p.id_paciente = c.id_paciente
+ORDER  BY c.fecha;
