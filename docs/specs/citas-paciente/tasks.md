@@ -1,7 +1,7 @@
 # Plan de implementación
 
 - [ ] 1. Crear los objetos de citas en citas.sql
-  - [ ] 1.1 Crear la secuencia seq_cita y la tabla cita
+  - [x] 1.1 Crear la secuencia seq_cita y la tabla cita
     - Crear `citas.sql` en la raíz del repo (junto a `consulta_paciente.sql`) con `CREATE SEQUENCE seq_cita START WITH 1 INCREMENT BY 1;`
     - `CREATE TABLE cita (id_cita NUMBER CONSTRAINT pk_cita PRIMARY KEY, id_paciente NUMBER NOT NULL, fecha DATE NOT NULL, estado VARCHAR2(20) DEFAULT 'PROGRAMADA' NOT NULL, CONSTRAINT fk_cita_paciente FOREIGN KEY (id_paciente) REFERENCES paciente (id_paciente));` (la tabla `paciente` ya existe; no se crea)
     - Comprobar: ejecutar el script, luego `INSERT INTO cita (id_cita, id_paciente, fecha) VALUES (seq_cita.NEXTVAL, <id existente>, SYSDATE + 1);` y `SELECT estado FROM cita;` devuelve `PROGRAMADA`; terminar con `ROLLBACK`
