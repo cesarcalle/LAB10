@@ -4,7 +4,7 @@
     {
       "id": 0,
       "prompt": "ya aprobé los requisitos y el diseño de citas-paciente, ahora arma el plan de tareas y déjalo bien revisado",
-      "expected_output": "Lanza un solo planner en modo estimacion para crear tasks.md, luego rondas de un planner por tarea en modo propuesta, aplica el consenso y cierra con una revisión final COMPLETO; tasks.md queda 100% iterado según progreso.py y el usuario recibe el informe con la tabla de rondas.",
+      "expected_output": "Lanza un solo planner en modo estimacion y un sintetizador escribe tasks.md; luego rondas de un planner por tarea en modo propuesta (ninguno escribe), un sintetizador aplica el consenso de cada ronda y cierra con una revisión final COMPLETO; tasks.md queda 100% iterado según progreso.py y el usuario recibe el informe con la tabla de rondas.",
       "files": [
         "evals/fixtures/sin-tareas"
       ],
@@ -22,7 +22,7 @@
     {
       "id": 1,
       "prompt": "el tasks.md de citas-paciente lo hice a la rápida, revísalo tarea por tarea: si el tamaño está bien, si sobran o faltan tareas, hasta que quede todo iterado",
-      "expected_output": "Lanza en paralelo un planner por cada una de las 3 tareas en modo propuesta; divide la tarea 1, elimina la 2 (comentario) y la 3 (despliegue), agrega la de pruebas_citas.sql; repite rondas hasta 100% y cierra con COMPLETO.",
+      "expected_output": "Lanza en paralelo un planner por cada una de las 3 tareas en modo propuesta; divide la tarea 1, elimina la 2 (comentario) y la 3 (despliegue), agrega la de pruebas_citas.sql; ningún planner escribe tasks.md (solo el sintetizador); repite rondas hasta 100% y cierra con COMPLETO.",
       "files": [
         "evals/fixtures/con-tareas"
       ],
