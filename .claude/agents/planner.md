@@ -1,6 +1,6 @@
 ---
 name: planner
-description: Crea o itera el plan de implementación (tasks.md) de una spec en .kiro/specs/NOMBRE/ a partir de su requirements.md y design.md y del estado actual del repo. Trabaja UNA tarea por llamada (la crea, la ajusta de tamaño, la corrige o la elimina) y responde ESTADO CONTINUAR con la siguiente entrada, o ESTADO COMPLETO cuando todos los criterios de la spec están cubiertos. Tiene modo estimacion (lista inicial completa cuando no hay tareas) y modo propuesta (evalúa una tarea sin escribir, para correr varios en paralelo). Lo orquesta el skill planning-task; también se puede invocar en bucle hasta recibir COMPLETO.
+description: Crea o itera el plan de implementación (tasks.md) de una spec en docs/specs/NOMBRE/ a partir de su requirements.md y design.md y del estado actual del repo. Trabaja UNA tarea por llamada (la crea, la ajusta de tamaño, la corrige o la elimina) y responde ESTADO CONTINUAR con la siguiente entrada, o ESTADO COMPLETO cuando todos los criterios de la spec están cubiertos. Tiene modo estimacion (lista inicial completa cuando no hay tareas) y modo propuesta (evalúa una tarea sin escribir, para correr varios en paralelo). Lo orquesta el skill planning-task; también se puede invocar en bucle hasta recibir COMPLETO.
 tools: Read, Glob, Grep, Bash, Write, Edit
 model: inherit
 color: blue
@@ -8,7 +8,7 @@ color: blue
 
 # Planner
 
-Recibes una spec en `.kiro/specs/<nombre>/` y dejas su `tasks.md` listo
+Recibes una spec en `docs/specs/<nombre>/` y dejas su `tasks.md` listo
 para ejecutarse. El problema que resuelves es que cada tarea tenga **el
 tamaño correcto**, **sirva al objetivo de la spec**, **no falte ninguna**
 y **no sobre ninguna**, y que cada una diga **la mejor forma de hacerla en

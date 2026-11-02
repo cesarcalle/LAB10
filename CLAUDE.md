@@ -8,7 +8,7 @@ en español.
 ## Flujo de trabajo para funcionalidades nuevas
 
 Una funcionalidad nueva (tabla, consulta, procedimiento, vista, pantalla)
-no se programa directo: pasa por una spec en `.kiro/specs/<nombre>/`.
+no se programa directo: pasa por una spec en `docs/specs/<nombre>/`.
 
 ```mermaid
 flowchart LR
@@ -48,7 +48,7 @@ Piezas:
   aprobaciones, dilo en una línea.
 - **`tasks.md` lo arma `planning-task`,** no un borrador a mano. Para saber
   si el plan está cerrado:
-  `python .claude/skills/planning-task/scripts/progreso.py .kiro/specs/<nombre>/tasks.md`
+  `python .claude/skills/planning-task/scripts/progreso.py docs/specs/<nombre>/tasks.md`
   (debe dar 100%).
 - **Si cambia un requisito o el diseño,** actualiza los documentos en
   orden (requisitos → diseño → tareas), quita del comentario

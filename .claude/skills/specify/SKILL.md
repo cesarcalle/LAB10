@@ -1,6 +1,6 @@
 ---
 name: specify
-description: Convierte una idea de funcionalidad en una spec al estilo Kiro con el enfoque Requirements-First, en tres documentos aprobados uno a uno por el usuario dentro de .kiro/specs/NOMBRE/ - requirements.md (historias de usuario y criterios EARS), design.md y tasks.md (este último lo arma el skill planning-task) - y luego ejecuta las tareas. Úsala siempre que el usuario pida una spec, especificación, requisitos, historias de usuario, criterios de aceptación, EARS o un plan de implementación antes de programar una funcionalidad nueva (tablas, consultas, procedimientos, pantallas, APIs), aunque no diga "spec" ni "Kiro"; y también cuando pida continuar, modificar o ejecutar las tareas de una spec que ya existe en .kiro/specs/.
+description: Convierte una idea de funcionalidad en una spec al estilo Kiro con el enfoque Requirements-First, en tres documentos aprobados uno a uno por el usuario dentro de docs/specs/NOMBRE/ - requirements.md (historias de usuario y criterios EARS), design.md y tasks.md (este último lo arma el skill planning-task) - y luego ejecuta las tareas. Úsala siempre que el usuario pida una spec, especificación, requisitos, historias de usuario, criterios de aceptación, EARS o un plan de implementación antes de programar una funcionalidad nueva (tablas, consultas, procedimientos, pantallas, APIs), aunque no diga "spec" ni "Kiro"; y también cuando pida continuar, modificar o ejecutar las tareas de una spec que ya existe en docs/specs/.
 ---
 
 # Specify (Requirements-First)
@@ -15,13 +15,13 @@ Todo se escribe en español, pero las palabras clave EARS (`WHEN`, `IF`,
 
 ## Antes de empezar
 
-1. **¿Ya existe la spec?** Mira `.kiro/specs/`. Si el usuario habla de una
+1. **¿Ya existe la spec?** Mira `docs/specs/`. Si el usuario habla de una
    spec existente, lee sus documentos y continúa desde la primera fase que
    no esté aprobada (o ejecuta tareas, si las tres lo están). No empieces
    de cero.
 2. **Nombre:** elige un nombre corto en kebab-case a partir de la idea
    (ej. `historial-citas-paciente`) y dilo en una línea. La carpeta es
-   `.kiro/specs/<nombre>/`.
+   `docs/specs/<nombre>/`.
 3. **Lee el repo:** lenguaje, motor de base de datos, convenciones,
    tablas o archivos relacionados. La spec debe encajar en lo que ya
    existe, no en un proyecto imaginario.
@@ -174,7 +174,7 @@ dilo en una línea.
 Solo cuando el usuario lo pida (ej. "empieza", "haz la tarea 2"):
 
 0. La primera vez, comprueba que el plan esté cerrado:
-   `python .claude/skills/planning-task/scripts/progreso.py .kiro/specs/<nombre>/tasks.md`.
+   `python .claude/skills/planning-task/scripts/progreso.py docs/specs/<nombre>/tasks.md`.
    Si no da 100%, alguien cambió tareas sin revisarlas: corre
    `planning-task` antes de implementar y pide de nuevo la aprobación.
 1. Lee los tres documentos antes de cada tarea.
