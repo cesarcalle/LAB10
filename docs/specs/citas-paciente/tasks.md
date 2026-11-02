@@ -6,7 +6,7 @@
     - `CREATE TABLE cita (id_cita NUMBER CONSTRAINT pk_cita PRIMARY KEY, id_paciente NUMBER NOT NULL, fecha DATE NOT NULL, estado VARCHAR2(20) DEFAULT 'PROGRAMADA' NOT NULL, CONSTRAINT fk_cita_paciente FOREIGN KEY (id_paciente) REFERENCES paciente (id_paciente));` (la tabla `paciente` ya existe; no se crea)
     - Comprobar: ejecutar el script, luego `INSERT INTO cita (id_cita, id_paciente, fecha) VALUES (seq_cita.NEXTVAL, <id existente>, SYSDATE + 1);` y `SELECT estado FROM cita;` devuelve `PROGRAMADA`; terminar con `ROLLBACK`
     - _Requisitos: 1.1_
-  - [ ] 1.2 Crear el procedimiento registrar_cita
+  - [x] 1.2 Crear el procedimiento registrar_cita
     - En `citas.sql`, después de la tabla: `CREATE OR REPLACE PROCEDURE registrar_cita(p_id_paciente IN cita.id_paciente%TYPE, p_fecha IN cita.fecha%TYPE)`
     - Primero validar la fecha: `IF p_fecha IS NULL OR p_fecha <= SYSDATE THEN RAISE_APPLICATION_ERROR(-20001, 'La fecha de la cita debe ser futura'); END IF;`
     - Después validar el paciente con `SELECT COUNT(*) INTO v_existe FROM paciente WHERE id_paciente = p_id_paciente;` y, si es 0, `RAISE_APPLICATION_ERROR(-20002, 'El paciente no existe');`
