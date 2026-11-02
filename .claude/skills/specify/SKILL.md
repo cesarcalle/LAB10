@@ -112,18 +112,18 @@ la tecnología) antes de escribir. Secciones:
 ## Fase 3: tasks.md
 
 Cuando el usuario apruebe el diseño, **usa el skill `planning-task`**
-para escribir el plan. Ese skill lanza subagentes `planner`: uno solo
-para la estimación inicial, o uno por tarea si `tasks.md` ya existe.
-Junta sus propuestas y repite hasta que el plan quede 100% iterado y con
-una revisión final `COMPLETO`. Lo usas en lugar de escribir las tareas
-tú porque cada planner revisa una tarea con su propio contexto contra el
-repo real, y así salen tareas mal dimensionadas, sobrantes o faltantes
-que un solo borrador no ve.
+para escribir el plan. Ese skill asegura la entrada y lanza el workflow
+`coverage-tasks`, que revisa cada tarea con un `planner` en paralelo y
+repite hasta que el plan quede 100% iterado y con una revisión final
+`COMPLETO`. Lo usas en lugar de escribir las tareas tú porque cada
+planner revisa una tarea con su propio contexto contra el repo real, y
+así salen tareas mal dimensionadas, sobrantes o faltantes que un solo
+borrador no ve.
 
-Cuando `planning-task` termine, sigue con "Aprobación entre fases": su
+Cuando el workflow termine, sigue con "Aprobación entre fases": su
 informe ya trae el resumen y los problemas de la spec que el usuario debe
-decidir. Si el skill no está disponible, escribe tú el plan con las
-reglas de abajo.
+decidir. Si ni el skill ni el workflow están disponibles, escribe tú el
+plan con las reglas de abajo.
 
 El plan, lo escriba quien lo escriba, es un plan de implementación que
 alguien pueda seguir paso a paso:
@@ -193,8 +193,9 @@ actualiza `requirements.md`, luego ajusta `design.md` y después
 `tasks.md`, pidiendo aprobación en cada paso.
 
 Para `tasks.md`, quita del comentario `<!-- planner: revisadas ... -->`
-las tareas a las que afecta el cambio y corre `planning-task`: solo se
-vuelven a revisar esas, y los planners agregan las que falten. Las tareas
+las tareas a las que afecta el cambio y corre `planning-task`, que vuelve
+a lanzar `coverage-tasks`: solo se revisan de nuevo esas, y los planners
+agregan las que falten. Las tareas
 ya completadas (`[x]`) no se desmarcan; si el cambio las afecta, se
 agrega una tarea nueva para adaptarlas.
 

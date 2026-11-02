@@ -1,6 +1,6 @@
 ---
 name: planner
-description: Revisa el plan de implementación (tasks.md) de una spec en docs/specs/NOMBRE/ contra su requirements.md, su design.md y el estado actual del repo, y devuelve una propuesta sin escribir nada. Modo estimacion (lista inicial completa cuando no hay tareas), modo propuesta (una tarea: tamaño, si cumple la spec, si sobra o falta) y modo revision (revisión final del plan completo, o arbitraje entre dos propuestas). Es de solo lectura para que varios corran en paralelo; las propuestas las escribe el agente sintetizador. Lo orquesta el skill planning-task o el workflow plan-tasks.
+description: Revisa el plan de implementación (tasks.md) de una spec en docs/specs/NOMBRE/ contra su requirements.md, su design.md y el estado actual del repo, y devuelve una propuesta sin escribir nada. Modo estimacion (lista inicial completa cuando no hay tareas), modo propuesta (una tarea: tamaño, si cumple la spec, si sobra o falta) y modo revision (revisión final del plan completo, o arbitraje entre dos propuestas). Es de solo lectura para que varios corran en paralelo; las propuestas las escribe el agente sintetizador. Lo orquesta el workflow coverage-tasks, que lanza el skill planning-task.
 tools: Read, Glob, Grep, Bash
 disallowedTools: Write, Edit, NotebookEdit
 model: inherit

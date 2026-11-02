@@ -4,37 +4,36 @@
     {
       "id": 0,
       "prompt": "ya aprobé los requisitos y el diseño de citas-paciente, ahora arma el plan de tareas y déjalo bien revisado",
-      "expected_output": "Lanza un solo planner en modo estimacion y un sintetizador escribe tasks.md; luego rondas de un planner por tarea en modo propuesta (ninguno escribe), un sintetizador aplica el consenso de cada ronda y cierra con una revisión final COMPLETO; tasks.md queda 100% iterado según progreso.py y el usuario recibe el informe con la tabla de rondas.",
-      "files": [
-        "evals/fixtures/sin-tareas"
-      ],
+      "expected_output": "Comprueba que existen requirements.md y design.md, corre progreso.py y dice que no hay tareas (habrá estimación inicial), y lanza el workflow coverage-tasks con {\"spec\": \"citas-paciente\", \"maxRondas\": 5}; si no tiene la herramienta de workflows, pide al usuario escribir /coverage-tasks citas-paciente. No escribe tasks.md ni lanza planners por su cuenta.",
+      "files": ["evals/fixtures/sin-tareas"],
       "assertions": [
-        "tasks.md queda 100% iterado según progreso.py",
-        "El comentario de revisadas no cita tareas inexistentes",
-        "Los 4 criterios (1.1, 1.2, 1.3, 2.1) están citados en alguna tarea",
-        "Hay una tarea para el script pruebas_citas.sql",
-        "No quedan tareas de desplegar ni de comentario de cabecera",
-        "requirements.md y design.md no cambiaron y no se escribió código",
-        "El informe reporta una revisión final COMPLETO",
-        "La estimación inicial la hizo un solo planner en modo estimacion"
+        "Comprueba que existen requirements.md y design.md antes de lanzar",
+        "Usa progreso.py y dice que no hay tareas y que habrá una estimación inicial",
+        "Lanza coverage-tasks con spec citas-paciente, o pide al usuario escribir /coverage-tasks citas-paciente",
+        "No escribe tasks.md ni lanza planners o sintetizadores por su cuenta"
       ]
     },
     {
       "id": 1,
       "prompt": "el tasks.md de citas-paciente lo hice a la rápida, revísalo tarea por tarea: si el tamaño está bien, si sobran o faltan tareas, hasta que quede todo iterado",
-      "expected_output": "Lanza en paralelo un planner por cada una de las 3 tareas en modo propuesta; divide la tarea 1, elimina la 2 (comentario) y la 3 (despliegue), agrega la de pruebas_citas.sql; ningún planner escribe tasks.md (solo el sintetizador); repite rondas hasta 100% y cierra con COMPLETO.",
-      "files": [
-        "evals/fixtures/con-tareas"
-      ],
+      "expected_output": "Mide con progreso.py y dice que parte de 0% con las tareas 1, 2 y 3 pendientes; explica en pocas líneas que coverage-tasks revisará cada tarea con un planner en paralelo y un sintetizador escribirá el consenso; lanza coverage-tasks (o pide /coverage-tasks citas-paciente). No edita tasks.md.",
+      "files": ["evals/fixtures/con-tareas"],
       "assertions": [
-        "tasks.md queda 100% iterado según progreso.py",
-        "El comentario de revisadas no cita tareas inexistentes",
-        "Los 4 criterios (1.1, 1.2, 1.3, 2.1) están citados en alguna tarea",
-        "Hay una tarea para el script pruebas_citas.sql",
-        "No quedan tareas de desplegar ni de comentario de cabecera",
-        "requirements.md y design.md no cambiaron y no se escribió código",
-        "El informe reporta una revisión final COMPLETO",
-        "La primera ronda lanzó un planner por cada una de las 3 tareas en modo propuesta"
+        "Informa que el plan parte de 0% con las tareas 1, 2 y 3 pendientes",
+        "Explica el proceso: planners de solo lectura en paralelo y un sintetizador que escribe",
+        "Lanza coverage-tasks con spec citas-paciente, o pide al usuario escribir /coverage-tasks citas-paciente",
+        "No edita tasks.md por su cuenta"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "pasemos a las tareas de citas-paciente",
+      "expected_output": "Detecta que falta design.md, no lanza el workflow y propone seguir con el skill specify para escribir el diseño.",
+      "files": ["evals/fixtures/sin-diseno"],
+      "assertions": [
+        "Detecta que falta design.md",
+        "No lanza coverage-tasks ni crea tasks.md",
+        "Propone escribir el diseño con el skill specify"
       ]
     }
   ]

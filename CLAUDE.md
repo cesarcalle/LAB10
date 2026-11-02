@@ -15,7 +15,7 @@ flowchart LR
     A[Idea] --> B[brainstorming]
     B --> C[specify: requirements.md]
     C -->|aprobado| D[specify: design.md]
-    D -->|aprobado| E[planning-task: tasks.md]
+    D -->|aprobado| E[planning-task → workflow coverage-tasks: tasks.md]
     E -->|100% iterado + COMPLETO + aprobado| F[specify: ejecutar tareas]
     E -. lanza en paralelo .-> P[planners: solo leen y proponen]
     P -. propuestas .-> S[sintetizador: único que escribe tasks.md]
@@ -26,23 +26,22 @@ flowchart LR
 | 1. Entender la idea | skill `brainstorming` (desde `specify`) | Resumen confirmado por el usuario | El usuario confirma el resumen |
 | 2. Requisitos | skill `specify`, fase 1 | `requirements.md` (historias y criterios EARS) | El usuario aprueba |
 | 3. Diseño | skill `specify`, fase 2 | `design.md` | El usuario aprueba |
-| 4. Tareas | skill `planning-task`, fase 3 de `specify` | `tasks.md` | 100% iterado, revisión final `COMPLETO` y el usuario aprueba |
+| 4. Tareas | skill `planning-task`, que lanza el workflow `coverage-tasks` | `tasks.md` | 100% iterado, revisión final `COMPLETO` y el usuario aprueba |
 | 5. Ejecutar | skill `specify`, fase 4 | Código y `[x]` en `tasks.md` | Una tarea por vez; el usuario pide la siguiente |
 
 Piezas:
 
 - `.claude/skills/specify/`: dirige todo el flujo y pide aprobación entre fases.
-- `.claude/skills/planning-task/`: arma y revisa `tasks.md`. Lanza un
-  `planner` para la estimación inicial si no hay tareas, o uno por tarea
-  si ya existen, decide el consenso de sus propuestas, se lo pasa al
-  `sintetizador` para que lo escriba, y repite hasta el 100%. Corre en la
-  conversación principal, no dentro de un subagente.
-- `.claude/workflows/plan-tasks.js`: la misma planeación como dynamic
-  workflow (`/plan-tasks <spec>`), con fan-out de planners por ronda,
-  consenso calculado en el script, un `sintetizador` que lo escribe y la
-  evaluación del alcance de cada tarea en el informe. Sirve para specs grandes: los resultados intermedios no
-  ocupan el contexto de la conversación. No hay aprobación a mitad de la
-  corrida; si un planner se bloquea, el workflow termina y lo reporta.
+- `.claude/skills/planning-task/`: explica el proceso de planeación,
+  asegura la entrada (spec elegida, requisitos y diseño aprobados, estado
+  de `tasks.md`) y lanza el workflow `coverage-tasks`. No planea por su
+  cuenta.
+- `.claude/workflows/coverage-tasks.js`: hace la planeación
+  (`/coverage-tasks <spec>`). Lanza los planners en paralelo por ronda,
+  decide el consenso en el script, le pasa el resultado al `sintetizador`
+  para que lo escriba y repite hasta el 100%; el informe trae el alcance
+  evaluado de cada tarea. No hay aprobación a mitad de la corrida: si un
+  planner se bloquea, el workflow termina y lo reporta.
 - `.claude/agents/planner.md`: revisa tareas contra la spec y el estado
   actual del repo (tamaño, si cumple la spec, si sobra o falta) y devuelve
   propuestas. **Es de solo lectura** para que varios corran en paralelo.
@@ -59,7 +58,8 @@ Piezas:
 - **No te saltes fases.** No escribas código sin `tasks.md` aprobado, ni
   `tasks.md` sin `design.md` aprobado. Si el usuario pide saltarse las
   aprobaciones, dilo en una línea.
-- **`tasks.md` lo arma `planning-task`,** no un borrador a mano. Para saber
+- **`tasks.md` lo arma el workflow `coverage-tasks`** (vía `planning-task`),
+  no un borrador a mano. Para saber
   si el plan está cerrado:
   `python .claude/skills/planning-task/scripts/progreso.py docs/specs/<nombre>/tasks.md`
   (debe dar 100%).

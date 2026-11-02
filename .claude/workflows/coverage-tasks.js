@@ -1,9 +1,10 @@
 export const meta = {
-  name: 'plan-tasks',
+  name: 'coverage-tasks',
   description: 'Genera o itera el tasks.md de cualquier spec en docs/specs/<nombre>/ con planners de solo lectura en paralelo (fan-out), junta sus propuestas en un consenso que escribe un único sintetizador, y repite hasta dejarlo 100% iterado, con el alcance de cada tarea evaluado contra la spec.',
 }
 
-// Versión en workflow del skill planning-task (.claude/skills/planning-task/SKILL.md).
+// Workflow de planeación de tareas. Lo lanza el skill planning-task (.claude/skills/planning-task/SKILL.md),
+// que explica el proceso y asegura la entrada antes de lanzarlo.
 // Fan-out-and-synthesize por rondas:
 //   reconocer la spec -> (sin tareas) 1 planner en modo estimacion -> sintetizador
 //   -> ronda: 1 planner en modo propuesta por cada tarea pendiente (en paralelo)
@@ -14,8 +15,8 @@ export const meta = {
 // Los planners (.claude/agents/planner.md) son de solo lectura: nunca escriben tasks.md.
 // El único que escribe es el sintetizador (.claude/agents/sintetizador.md), una vez por paso.
 //
-// Uso:  /plan-tasks citas-paciente
-//       /plan-tasks {"spec": "citas-paciente", "maxRondas": 5}
+// Uso:  /coverage-tasks citas-paciente
+//       /coverage-tasks {"spec": "citas-paciente", "maxRondas": 5}
 
 // args a veces llega como texto JSON en lugar de objeto: aceptar las dos formas.
 const entrada = typeof args === 'string'
@@ -226,7 +227,7 @@ const spec = await agent(
 
 if (!spec) return 'No se pudo leer docs/specs/. Revisa que exista la carpeta y vuelve a intentar.'
 if (!spec.nombre) {
-  return `Indica qué spec planear, por ejemplo \`/plan-tasks ${spec.candidatos[0] ?? '<nombre>'}\`. ` +
+  return `Indica qué spec planear, por ejemplo \`/coverage-tasks ${spec.candidatos[0] ?? '<nombre>'}\`. ` +
     `Specs disponibles: ${spec.candidatos.length ? spec.candidatos.join(', ') : 'ninguna en docs/specs/'}.`
 }
 if (spec.faltan.length) {

@@ -1,6 +1,6 @@
 ---
 name: sintetizador
-description: Único agente que escribe el tasks.md de una spec en docs/specs/NOMBRE/. Recibe el consenso ya decidido de una ronda de planners (estimación inicial, propuestas por tarea, tareas faltantes, arbitrajes o correcciones de la revisión final), lo aplica en un solo paso, renumera, actualiza el comentario de tareas revisadas y mide el progreso. No decide qué tareas cambian; solo aplica. Lo orquesta el skill planning-task o el workflow plan-tasks.
+description: Único agente que escribe el tasks.md de una spec en docs/specs/NOMBRE/. Recibe el consenso ya decidido de una ronda de planners (estimación inicial, propuestas por tarea, tareas faltantes, arbitrajes o correcciones de la revisión final), lo aplica en un solo paso, renumera, actualiza el comentario de tareas revisadas y mide el progreso. No decide qué tareas cambian; solo aplica. Lo orquesta el workflow coverage-tasks, que lanza el skill planning-task.
 tools: Read, Glob, Grep, Bash, Write, Edit
 model: inherit
 color: green
