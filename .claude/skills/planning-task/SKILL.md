@@ -1,171 +1,108 @@
 ---
 name: planning-task
-description: Planea las tareas de implementación de una spec en .kiro/specs/NOMBRE/ a partir de su requirements.md y design.md, lanzando subagentes planner - uno solo para la estimación inicial si tasks.md no tiene tareas, o uno por cada tarea si ya existen - y juntando sus propuestas en un plan de consenso hasta que tasks.md quede 100% iterado. Es la fase 3 del skill specify. Úsala siempre que el usuario pida crear, estimar, revisar, mejorar, completar o "cerrar" el plan de tareas (tasks.md) de una spec, cuando diga que los requisitos y el diseño ya están aprobados y quiera pasar a las tareas, o cuando pida revisar si las tareas tienen el tamaño correcto, si sobran o si faltan, aunque no diga "planning-task" ni "planner".
+description: Fase de planeación de tareas de una spec en docs/specs/NOMBRE/. Explica cómo se planean las tareas, asegura que la entrada esté lista (spec elegida, requirements.md y design.md presentes y aprobados, estado de tasks.md) y lanza el workflow coverage-tasks, que genera o itera tasks.md con planners en paralelo hasta dejarlo 100% iterado y con el alcance evaluado. Es la fase 3 del skill specify. Úsala siempre que el usuario pida crear, estimar, revisar, completar o "cerrar" el plan de tareas (tasks.md) de una spec, diga que los requisitos y el diseño ya están aprobados y quiera pasar a las tareas, pregunte si las tareas tienen el tamaño correcto o si sobran o faltan, o pregunte cómo funciona la planeación, aunque no diga "planning-task", "planner" ni "coverage-tasks".
 ---
 
 # Planning task
 
-Toma la salida de una spec (`requirements.md` y `design.md`) y la
-convierte en un `tasks.md` en el que todos están de acuerdo: cada tarea
-del tamaño correcto, necesaria, alineada con la spec y con el repo, y sin
-huecos. Tú no revisas las tareas: lo hacen los subagentes `planner`. Tu
-trabajo es decidir cuántos lanzar, juntar lo que proponen y repetir hasta
-que el plan quede **100% iterado**.
+La planeación la hace el workflow `coverage-tasks`
+(`.claude/workflows/coverage-tasks.js`). Este skill hace tres cosas:
+explica el proceso, asegura que la entrada del workflow esté lista y lo
+lanza. No planea tareas por su cuenta.
 
-"100% iterado" significa que cada tarea de `tasks.md` está hecha (`[x]`)
-o fue revisada por un planner y quedó en el comentario
-`<!-- planner: revisadas ... -->`, y que un planner hizo la revisión final
-y respondió `COMPLETO`. Las dos cosas hacen falta: el porcentaje dice que
-nadie se saltó una tarea, y la revisión final dice que el conjunto tiene
-sentido (orden, cobertura, sin duplicados).
+## Cómo funciona el proceso
 
-## Antes de empezar
+Explícalo así cuando el usuario pregunte, o en una línea antes de lanzar
+el workflow:
 
-1. **Spec.** Busca la carpeta en `.kiro/specs/`. Si hay varias y el
-   usuario no dijo cuál, pregúntale. Si faltan `requirements.md` o
-   `design.md`, detente: sin los dos no hay qué planear. Sugiere el skill
-   `specify` para escribirlos.
-2. **Planner.** Lee `.claude/agents/planner.md` una vez, para conocer sus
-   modos y el formato de su informe. Lánzalo con `subagent_type:
-   "planner"`. Si ese tipo no está disponible (por ejemplo, el agente se
-   creó después de abrir la sesión), usa `general-purpose` y empieza el
-   prompt con: "Lee `.claude/agents/planner.md` y actúa exactamente como
-   ese agente."
+- **Tres papeles.** Los `planner` (`.claude/agents/planner.md`) revisan y
+  proponen, y son de solo lectura para poder correr varios en paralelo.
+  El script del workflow decide el consenso sin gastar tokens: quita
+  duplicados y detecta conflictos. El `sintetizador`
+  (`.claude/agents/sintetizador.md`) es el único que escribe `tasks.md`,
+  una vez por paso.
+- **Si no hay tareas,** un solo planner propone la lista inicial y el
+  sintetizador la escribe.
+- **En cada ronda,** un planner por tarea pendiente revisa en paralelo:
+  si la tarea es necesaria, si cumple la spec, si tiene el tamaño correcto
+  y si dice cómo hacerla en el repo tal como está. Si dos propuestas
+  chocan, decide un árbitro. El sintetizador aplica todo y mide con
+  `scripts/progreso.py`.
+- **Cuando llega al 100%,** un planner hace la revisión final del plan
+  completo. Si encuentra algo, se corrige y se vuelve a medir. Termina con
+  `COMPLETO` y la evaluación del alcance de cada tarea.
+- **Límites:** 5 rondas y 3 cierres. Un `BLOQUEADO` termina la corrida,
+  porque un workflow no acepta respuestas a mitad de camino.
 
-   Ejecuta este skill en la conversación principal, no lo delegues a un
-   subagente: según el entorno, un subagente puede no tener la
-   herramienta para lanzar otros, y entonces no habría planners. Si aun
-   así no puedes lanzar subagentes, haz cada llamada del planner tú mismo
-   siguiendo `planner.md` al pie de la letra, una a la vez, y avísale al
-   usuario en el informe que la revisión no vino de contextos separados.
-3. **Estado.** Mide dónde está el plan:
+"100% iterado" significa que cada tarea está hecha (`[x]`) o la revisó un
+planner y quedó en el comentario `<!-- planner: revisadas ... -->`.
+
+## 1. Asegurar la entrada
+
+El workflow no puede preguntar nada mientras corre, así que todo lo que
+haga falta decidir se decide antes.
+
+1. **Spec.** Lista `docs/specs/`. Si el usuario no dijo cuál y hay más de
+   una, pregúntale.
+2. **Requisitos y diseño.** Comprueba que existan `requirements.md` y
+   `design.md`. Si falta alguno, o en esta conversación el usuario todavía
+   no aprobó el diseño, detente y sigue con el skill `specify`: planear
+   sobre una spec sin aprobar es planear dos veces.
+3. **Estado de `tasks.md`.** Mide:
 
    ```bash
-   python .claude/skills/planning-task/scripts/progreso.py .kiro/specs/<nombre>/tasks.md
+   python .claude/skills/planning-task/scripts/progreso.py docs/specs/<nombre>/tasks.md
    ```
 
-   El script dice el porcentaje iterado y qué tareas de primer nivel están
-   pendientes, o que no hay tareas. Úsalo en lugar de contar a mano:
-   contar a mano es donde se cuelan las tareas que nadie revisó.
+   Dile al usuario de dónde parte: sin tareas (habrá estimación inicial),
+   o el porcentaje iterado y qué tareas están pendientes. Si el usuario
+   cambió a mano tareas que ya estaban revisadas, o si cambió un requisito
+   o el diseño, quita esas tareas del comentario de revisadas: si no, el
+   workflow no las vuelve a revisar. Si el script avisa de números
+   huérfanos, corrige el comentario antes de lanzar.
+4. **Problemas conocidos.** Si la spec tiene una ambigüedad que ya
+   sabes que bloquea (por ejemplo, dos documentos que se contradicen),
+   resuélvela con el usuario ahora. Si no, el workflow terminará en
+   `BLOQUEADO` después de gastar una ronda.
+5. **Rondas.** Por defecto, 5. Usa otro valor solo si el usuario lo pide.
 
-## Ruta A: no hay tareas → un solo planner
+## 2. Lanzar el workflow
 
-Si `tasks.md` no existe o no tiene tareas, lanza **un** planner:
+Lanza `coverage-tasks` con la herramienta de workflows, pasando como
+argumento:
 
-```
-spec: <nombre>
-modo: estimacion
-```
-
-Uno solo, porque una estimación inicial necesita ver la spec entera para
-repartir el trabajo sin solaparse; varios planners escribiendo la lista a
-la vez producirían tareas duplicadas. El planner escribe la lista
-completa sin marcar ninguna como revisada. Vuelve a medir con el script
-(debe dar 0%) y sigue con la ruta B: la estimación es un borrador, y cada
-tarea se revisa después por separado.
-
-## Ruta B: hay tareas → un planner por tarea, en rondas
-
-Cada ronda tiene tres pasos.
-
-### 1. Lanzar
-
-Por cada tarea de primer nivel pendiente que dio el script, lanza un
-planner en **modo propuesta**, todos en el mismo mensaje para que corran
-en paralelo:
-
-```
-spec: <nombre>
-modo: propuesta
-tarea: <número>
-nota: <lo que el usuario dijo de esa tarea, si dijo algo>
+```json
+{ "spec": "<nombre>", "maxRondas": 5 }
 ```
 
-La unidad es la tarea de primer nivel con sus subtareas, porque dividir y
-fusionar ocurre a ese nivel; si dos planners revisaran una tarea y su
-subtarea, se pisarían. Van en modo propuesta (no escriben) porque todos
-leen el mismo `tasks.md`: si escribieran a la vez, el último borraría los
-cambios de los demás.
+El usuario aprueba el lanzamiento en la tarjeta que muestra el plan de
+fases. Lánzalo desde la conversación principal: los subagentes no tienen
+la herramienta de workflows.
 
-### 2. Llegar al consenso
-
-Junta los informes y decide qué entra al plan:
-
-| Lo que llega | Qué haces |
-|---|---|
-| Acción `sin cambios` | La tarea queda como está y se marca revisada. |
-| Un cambio que solo toca su propia tarea (corregida, dividida, marcada opcional) | Aplica el bloque de la propuesta y marca revisados la tarea y sus subtareas. |
-| `ELIMINAR` | Bórrala, salvo que otra propuesta dependa de ella (entonces es un conflicto). |
-| Conflicto: dos propuestas tocan lo mismo (una quiere fusionar la tarea 3 con la 4 y la de la 4 la reescribe; o una elimina algo que otra usa) | No elijas tú. Lanza un planner en modo `aplicar` sobre la tarea en disputa, con las dos propuestas en la `nota`, y aplica lo que decida. Tú coordinas; el criterio técnico es del planner, que vuelve a leer la spec y el repo. |
-| Tareas faltantes | Junta las de todos los informes, quita duplicados (dos que cubren el mismo criterio o pieza son una) y agrégalas en la posición que respeta las dependencias, **sin** marcarlas revisadas: se revisan en la próxima ronda. |
-| `BLOQUEADO` o un problema de la spec que impide cubrir un criterio | Detente y pregunta al usuario. Sin esa decisión no hay consenso posible; seguir solo esconde el problema. |
-| Problemas de la spec que no bloquean | Anótalos para el informe final. |
-
-Después de aplicar todo, renumera, actualiza el comentario
-`<!-- planner: revisadas ... -->` con los números nuevos y mide con el
-script. Si avisa de "revisadas que no existen", olvidaste actualizar un
-número: corrígelo antes de seguir.
-
-### 3. Repetir
-
-Mientras el script muestre tareas pendientes, haz otra ronda solo con
-esas. Lo normal es que cada ronda tenga menos tareas que la anterior
-(solo las nuevas y las que cambiaron por un conflicto).
-
-## Cierre: la revisión final
-
-Cuando el script dé 100%, lanza **un** planner:
+Si en esta sesión no tienes esa herramienta (Claude Code anterior a
+v2.1.154, o los workflows desactivados en `/config`), pídele al usuario
+que lo lance él escribiendo:
 
 ```
-spec: <nombre>
-modo: aplicar
-tarea: siguiente
+/coverage-tasks <nombre>
 ```
 
-Como todas están revisadas, hace la revisión final del plan completo.
+No reproduzcas la planeación a mano: perderías la revisión en paralelo
+de cada tarea con su propio contexto, que es lo que el proceso asegura.
 
-- Si responde `COMPLETO`, terminaste.
-- Si responde `CONTINUAR`, corrigió algo del conjunto (un orden, una
-  dependencia entre tareas que una revisión aislada no podía ver). Mide
-  con el script: si sigue en 100%, el planner ya revisó lo que tocó y
-  lanzas otro cierre; si bajó, haz una ronda con lo pendiente y vuelve al
-  cierre. Es normal que el primer cierre encuentre algo: es la única
-  revisión que ve todas las tareas juntas.
+## 3. Al terminar
 
-**Límite:** 5 rondas en total. Si se alcanzan sin `COMPLETO`, para y dile
-al usuario qué tareas siguen cambiando de una ronda a otra y por qué. Si
-dos planners se contradicen ronda tras ronda, casi siempre la spec es
-ambigua en ese punto, y eso lo decide el usuario.
+El workflow devuelve un informe con la tabla de pasos, el porcentaje
+iterado, el alcance evaluado y los problemas de la spec.
 
-## Informe al usuario
-
-Al terminar, escribe:
-
-```markdown
-**Spec:** <nombre> — tasks.md iterado al <N>% (<iteradas>/<total>), revisión final: COMPLETO
-
-| Ronda | Planners | Resultado |
-|---|---|---|
-| 0 | 1 (estimación) | <N> tareas iniciales |
-| 1 | <N> | <cambios: divididas, fusionadas, eliminadas, agregadas, conflictos> |
-
-**Cambios principales:** <3–6 líneas con lo más importante y su porqué>
-
-**Problemas en la spec:** <lo que el usuario debe decidir, o "ninguno">
-```
-
-Copia el porcentaje de la salida del script, no lo calcules. Luego
-pregunta si aprueba el plan: `COMPLETO` significa que el plan es
-coherente, no que el usuario lo haya aceptado. No empieces a implementar
-tareas en el mismo turno.
-
-## Señales de alerta
-
-| Pensamiento | Realidad |
-|---|---|
-| "Hay tareas, pero las reviso yo para ir más rápido" | La revisión es del planner, que mira el repo con su propio contexto. Tú juntas. |
-| "Le paso todo el skill a un subagente para no llenar mi contexto" | Puede quedarse sin forma de lanzar planners. El skill corre en la conversación principal. |
-| "Lanzo los planners en modo aplicar, es más simple" | Escriben a la vez en el mismo archivo y se borran los cambios unos a otros. |
-| "Dos propuestas chocan; me quedo con la que me gusta" | Un conflicto lo resuelve un planner que lee las dos y la spec. |
-| "El script da 100%, ya está" | Falta la revisión final: el porcentaje no ve el orden ni los duplicados. |
-| "La ronda 6 seguro lo arregla" | Si 5 rondas no convergen, el problema está en la spec, no en las tareas. |
+- **`COMPLETO`:** muéstrale el informe al usuario tal cual. Confirma con
+  `progreso.py` que dé 100% y pregunta si aprueba el plan. `COMPLETO`
+  significa que el plan es coherente, no que el usuario lo haya
+  aceptado. No empieces a implementar en el mismo turno.
+- **`BLOQUEADO`:** explícale al usuario qué tiene que decidir. Con su
+  respuesta, actualiza `requirements.md` o `design.md` (con su
+  aprobación, siguiendo `specify`) y vuelve a lanzar el workflow: retoma
+  desde lo que ya quedó revisado.
+- **Sin converger:** casi siempre la spec es ambigua en las tareas que
+  cambian en cada ronda. Muéstralas, resuelve la ambigüedad con el
+  usuario y vuelve a lanzar.

@@ -1,6 +1,6 @@
 ---
 name: specify
-description: Convierte una idea de funcionalidad en una spec al estilo Kiro con el enfoque Requirements-First, en tres documentos aprobados uno a uno por el usuario dentro de .kiro/specs/NOMBRE/ - requirements.md (historias de usuario y criterios EARS), design.md y tasks.md (este último lo arma el skill planning-task) - y luego ejecuta las tareas. Úsala siempre que el usuario pida una spec, especificación, requisitos, historias de usuario, criterios de aceptación, EARS o un plan de implementación antes de programar una funcionalidad nueva (tablas, consultas, procedimientos, pantallas, APIs), aunque no diga "spec" ni "Kiro"; y también cuando pida continuar, modificar o ejecutar las tareas de una spec que ya existe en .kiro/specs/.
+description: Convierte una idea de funcionalidad en una spec al estilo Kiro con el enfoque Requirements-First, en tres documentos aprobados uno a uno por el usuario dentro de docs/specs/NOMBRE/ - requirements.md (historias de usuario y criterios EARS), design.md y tasks.md (este último lo arma el skill planning-task) - y luego ejecuta las tareas. Úsala siempre que el usuario pida una spec, especificación, requisitos, historias de usuario, criterios de aceptación, EARS o un plan de implementación antes de programar una funcionalidad nueva (tablas, consultas, procedimientos, pantallas, APIs), aunque no diga "spec" ni "Kiro"; y también cuando pida continuar, modificar o ejecutar las tareas de una spec que ya existe en docs/specs/.
 ---
 
 # Specify (Requirements-First)
@@ -15,13 +15,13 @@ Todo se escribe en español, pero las palabras clave EARS (`WHEN`, `IF`,
 
 ## Antes de empezar
 
-1. **¿Ya existe la spec?** Mira `.kiro/specs/`. Si el usuario habla de una
+1. **¿Ya existe la spec?** Mira `docs/specs/`. Si el usuario habla de una
    spec existente, lee sus documentos y continúa desde la primera fase que
    no esté aprobada (o ejecuta tareas, si las tres lo están). No empieces
    de cero.
 2. **Nombre:** elige un nombre corto en kebab-case a partir de la idea
    (ej. `historial-citas-paciente`) y dilo en una línea. La carpeta es
-   `.kiro/specs/<nombre>/`.
+   `docs/specs/<nombre>/`.
 3. **Lee el repo:** lenguaje, motor de base de datos, convenciones,
    tablas o archivos relacionados. La spec debe encajar en lo que ya
    existe, no en un proyecto imaginario.
@@ -112,18 +112,18 @@ la tecnología) antes de escribir. Secciones:
 ## Fase 3: tasks.md
 
 Cuando el usuario apruebe el diseño, **usa el skill `planning-task`**
-para escribir el plan. Ese skill lanza subagentes `planner`: uno solo
-para la estimación inicial, o uno por tarea si `tasks.md` ya existe.
-Junta sus propuestas y repite hasta que el plan quede 100% iterado y con
-una revisión final `COMPLETO`. Lo usas en lugar de escribir las tareas
-tú porque cada planner revisa una tarea con su propio contexto contra el
-repo real, y así salen tareas mal dimensionadas, sobrantes o faltantes
-que un solo borrador no ve.
+para escribir el plan. Ese skill asegura la entrada y lanza el workflow
+`coverage-tasks`, que revisa cada tarea con un `planner` en paralelo y
+repite hasta que el plan quede 100% iterado y con una revisión final
+`COMPLETO`. Lo usas en lugar de escribir las tareas tú porque cada
+planner revisa una tarea con su propio contexto contra el repo real, y
+así salen tareas mal dimensionadas, sobrantes o faltantes que un solo
+borrador no ve.
 
-Cuando `planning-task` termine, sigue con "Aprobación entre fases": su
+Cuando el workflow termine, sigue con "Aprobación entre fases": su
 informe ya trae el resumen y los problemas de la spec que el usuario debe
-decidir. Si el skill no está disponible, escribe tú el plan con las
-reglas de abajo.
+decidir. Si ni el skill ni el workflow están disponibles, escribe tú el
+plan con las reglas de abajo.
 
 El plan, lo escriba quien lo escriba, es un plan de implementación que
 alguien pueda seguir paso a paso:
@@ -174,15 +174,24 @@ dilo en una línea.
 Solo cuando el usuario lo pida (ej. "empieza", "haz la tarea 2"):
 
 0. La primera vez, comprueba que el plan esté cerrado:
-   `python .claude/skills/planning-task/scripts/progreso.py .kiro/specs/<nombre>/tasks.md`.
+   `python .claude/skills/planning-task/scripts/progreso.py docs/specs/<nombre>/tasks.md`.
    Si no da 100%, alguien cambió tareas sin revisarlas: corre
    `planning-task` antes de implementar y pide de nuevo la aprobación.
 1. Lee los tres documentos antes de cada tarea.
 2. Haz **una tarea a la vez** (la que pida, o la siguiente pendiente).
    Implementa solo lo que dice esa tarea.
-3. Pruébala si el entorno lo permite y di qué probaste.
-4. Márcala `[x]` en `tasks.md` (y la tarea padre cuando todas sus
-   subtareas estén hechas).
+3. Verifícala con el subagente `task-verificator`
+   (`spec: <nombre>`, `tarea: <número>`). Él ejecuta las pruebas de la
+   tarea y las de sus criterios, sin cambiar nada, y dictamina `CUMPLE`,
+   `NO CUMPLE` o `NO VERIFICADO`. Lo hace otro agente para que quien
+   implementa no se califique a sí mismo.
+   - `NO CUMPLE`: corrige lo que indica y vuelve a verificar.
+   - `NO VERIFICADO` (por ejemplo, no hay base de datos): muéstrale al
+     usuario los comandos para verificar a mano y pregúntale si marca la
+     tarea igual.
+4. Márcala `[x]` en `tasks.md` solo con `CUMPLE`, o con `NO VERIFICADO`
+   si el usuario lo acepta (y la tarea padre cuando todas sus subtareas
+   estén hechas).
 5. Para y resume lo hecho. No sigas con la siguiente salvo que el
    usuario pida ejecutar todas.
 
@@ -193,8 +202,9 @@ actualiza `requirements.md`, luego ajusta `design.md` y después
 `tasks.md`, pidiendo aprobación en cada paso.
 
 Para `tasks.md`, quita del comentario `<!-- planner: revisadas ... -->`
-las tareas a las que afecta el cambio y corre `planning-task`: solo se
-vuelven a revisar esas, y los planners agregan las que falten. Las tareas
+las tareas a las que afecta el cambio y corre `planning-task`, que vuelve
+a lanzar `coverage-tasks`: solo se revisan de nuevo esas, y los planners
+agregan las que falten. Las tareas
 ya completadas (`[x]`) no se desmarcan; si el cambio las afecta, se
 agrega una tarea nueva para adaptarlas.
 
