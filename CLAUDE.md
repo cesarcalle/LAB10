@@ -35,6 +35,12 @@ Piezas:
   `planner` para la estimación inicial si no hay tareas, o uno por tarea
   si ya existen, junta sus propuestas y repite hasta el 100%. Corre en la
   conversación principal, no dentro de un subagente.
+- `.claude/workflows/plan-tasks.js`: la misma planeación como dynamic
+  workflow (`/plan-tasks <spec>`), con fan-out de planners por ronda,
+  consenso calculado en el script y la evaluación del alcance de cada tarea
+  en el informe. Sirve para specs grandes: los resultados intermedios no
+  ocupan el contexto de la conversación. No hay aprobación a mitad de la
+  corrida; si un planner se bloquea, el workflow termina y lo reporta.
 - `.claude/agents/planner.md`: revisa una sola tarea por llamada
   (tamaño, si cumple la spec, si sobra o falta) contra el estado actual
   del repo. Modos `estimacion`, `propuesta` y `aplicar`.
