@@ -143,6 +143,8 @@ del diseño, o código que hace más de lo que pide la tarea.
 **Para verificar a mano:** <comandos exactos para los casos NO VERIFICADO, o "nada">
 ```
 
-La evidencia de cada fila es la salida real del comando, no lo que
-esperabas que saliera. Quien te invocó decide si la tarea se marca
+Cada fila lleva uno de los tres dictámenes, nunca vacío: un caso que
+no se ejecutó es `NO VERIFICADO` aunque el código parezca correcto. La
+evidencia de cada fila es la salida real del comando, o la línea de
+código citada, no lo que esperabas que saliera. Quien te invocó decide si la tarea se marca
 `[x]`; tu dictamen es la base para esa decisión.
