@@ -18,7 +18,7 @@
     - Antes de escribirla, confirmar con `DESC paciente` el nombre real de la columna del nombre (se asume `nombre`)
     - Comprobar: con dos citas del mismo paciente insertadas en orden inverso, `SELECT * FROM v_citas_paciente WHERE id_paciente = <id> ORDER BY fecha;` las lista de la más próxima a la más lejana
     - _Requisitos: 2.1_
-- [ ] 2. Crear el script de pruebas pruebas_citas.sql
+- [x] 2. Crear el script de pruebas pruebas_citas.sql
   - Crear `pruebas_citas.sql` en la raíz del repo, junto a `citas.sql`, con `SET SERVEROUTPUT ON`; tomar un paciente existente con `SELECT MIN(id_paciente)` y uno inexistente con `SELECT NVL(MAX(id_paciente), 0) + 1` desde `paciente`, sin insertar pacientes porque solo se conoce su columna `id_paciente`
   - Caso normal: bloque anónimo que llama `registrar_cita(<existente>, SYSDATE + 1)` y comprueba que la nueva fila de `cita` tiene `estado = 'PROGRAMADA'`; imprime `OK normal` o `FALLA normal` con `DBMS_OUTPUT.PUT_LINE`
   - Caso fecha pasada: `registrar_cita(<existente>, SYSDATE - 1)` dentro de `BEGIN ... EXCEPTION WHEN OTHERS`; imprime `OK fecha pasada` solo si `SQLCODE = -20001` (si no lanza error, imprime `FALLA`)
