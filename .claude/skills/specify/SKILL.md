@@ -180,9 +180,18 @@ Solo cuando el usuario lo pida (ej. "empieza", "haz la tarea 2"):
 1. Lee los tres documentos antes de cada tarea.
 2. Haz **una tarea a la vez** (la que pida, o la siguiente pendiente).
    Implementa solo lo que dice esa tarea.
-3. Pruébala si el entorno lo permite y di qué probaste.
-4. Márcala `[x]` en `tasks.md` (y la tarea padre cuando todas sus
-   subtareas estén hechas).
+3. Verifícala con el subagente `task-verificator`
+   (`spec: <nombre>`, `tarea: <número>`). Él ejecuta las pruebas de la
+   tarea y las de sus criterios, sin cambiar nada, y dictamina `CUMPLE`,
+   `NO CUMPLE` o `NO VERIFICADO`. Lo hace otro agente para que quien
+   implementa no se califique a sí mismo.
+   - `NO CUMPLE`: corrige lo que indica y vuelve a verificar.
+   - `NO VERIFICADO` (por ejemplo, no hay base de datos): muéstrale al
+     usuario los comandos para verificar a mano y pregúntale si marca la
+     tarea igual.
+4. Márcala `[x]` en `tasks.md` solo con `CUMPLE`, o con `NO VERIFICADO`
+   si el usuario lo acepta (y la tarea padre cuando todas sus subtareas
+   estén hechas).
 5. Para y resume lo hecho. No sigas con la siguiente salvo que el
    usuario pida ejecutar todas.
 

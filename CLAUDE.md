@@ -27,7 +27,7 @@ flowchart LR
 | 2. Requisitos | skill `specify`, fase 1 | `requirements.md` (historias y criterios EARS) | El usuario aprueba |
 | 3. Diseño | skill `specify`, fase 2 | `design.md` | El usuario aprueba |
 | 4. Tareas | skill `planning-task`, que lanza el workflow `coverage-tasks` | `tasks.md` | 100% iterado, revisión final `COMPLETO` y el usuario aprueba |
-| 5. Ejecutar | skill `specify`, fase 4 | Código y `[x]` en `tasks.md` | Una tarea por vez; el usuario pide la siguiente |
+| 5. Ejecutar | skill `specify`, fase 4, y `task-verificator` | Código verificado y `[x]` en `tasks.md` | Una tarea por vez; `CUMPLE` antes de marcarla; el usuario pide la siguiente |
 
 Piezas:
 
@@ -50,6 +50,11 @@ Piezas:
   Aplica en un solo paso el consenso de cada ronda (o la estimación, o las
   correcciones del cierre), renumera, actualiza el comentario de revisadas
   y mide el progreso.
+- `.claude/agents/task-verificator.md`: verifica una tarea ya
+  implementada. Ejecuta sus pruebas y las de sus criterios, y dictamina
+  por criterio `CUMPLE`, `NO CUMPLE` o `NO VERIFICADO`, más si respeta la
+  intención (historia de usuario y diseño). No corrige ni marca tareas, y
+  nunca deja datos en la base (`ROLLBACK`, sin DDL).
 - `.claude/skills/brainstorming/`: preguntas para entender la idea.
 - `.claude/skills/skill-creator/`: para crear o mejorar skills.
 
@@ -67,6 +72,8 @@ Piezas:
   orden (requisitos → diseño → tareas), quita del comentario
   `<!-- planner: revisadas ... -->` las tareas afectadas y vuelve a correr
   `planning-task`.
-- **Una tarea a la vez** al implementar, y márcala `[x]` al terminar.
+- **Una tarea a la vez** al implementar. Márcala `[x]` solo cuando
+  `task-verificator` dictamine `CUMPLE`, o `NO VERIFICADO` si el usuario
+  lo acepta.
 - `COMPLETO` significa que el plan es coherente, no que esté aprobado:
   la aprobación siempre es del usuario.
